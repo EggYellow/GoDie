@@ -1,0 +1,16 @@
+{
+  "PanelList": [
+    {
+      "PanelName": "StatuPanel",
+      "PanelPath": "UIPanel/StatuPanel"
+    },
+    {
+      "PanelName": "MenuPanel",
+      "PanelPath": "UIPanel/MenuPanel"
+    },
+    {
+      "PanelName": "ToolBarPanel",
+      "PanelPath": "UIPanel/ToolBarPanel"
+    }
+  ]
+}
