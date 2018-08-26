@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "txtConv.py", line 136, in <module>
+  File "txtConv.py", line 115, in BeginConvert
+IOError: [Errno 2] No such file or directory: 'SplitTableList.txt'
+Traceback (most recent call last):
+  File "txtConv.py", line 136, in <module>
+  File "txtConv.py", line 115, in BeginConvert
+IOError: [Errno 2] No such file or directory: 'SplitTableList.txt'
+Traceback (most recent call last):
+  File "txtConv.py", line 136, in <module>
+  File "txtConv.py", line 130, in BeginConvert
+  File "txtConv.py", line 83, in ConvertTxt
+IOError: [Errno 13] Permission denied: './TempDstTables/Achievement.txt'
+Traceback (most recent call last):
+  File "txtConv.py", line 136, in <module>
+  File "txtConv.py", line 130, in BeginConvert
+  File "txtConv.py", line 83, in ConvertTxt
+IOError: [Errno 2] No such file or directory: './TempDstTables/Achievement.txt'
+Traceback (most recent call last):
+  File "txtConv.py", line 136, in <module>
+  File "txtConv.py", line 130, in BeginConvert
+  File "txtConv.py", line 83, in ConvertTxt
+IOError: [Errno 2] No such file or directory: './TempDstTables/Achievement.txt'

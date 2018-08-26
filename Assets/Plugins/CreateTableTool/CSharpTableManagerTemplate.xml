@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<plist>
+  <!--Inner descript ${N} =\n ${L} =< ${R} = '>'-->
+  
+  <descript>//Auto Created by Robot, Don't try to Modify</descript>
+  
+  <import>
+    using System;${N}
+    using System.Collections.Generic;${N}
+    using System.Collections;${N}
+     using UnityEngine;${N}
+     using System.IO;${N}
+  </import>
+  
+  <namespace>namespace  Games.Table{ </namespace>
+  <classhead>
+   
+    public  delegate void SerializableTable(string[] valuesList, int skey, Dictionary${L}int, List${L}object${R} ${R} _hash);${N}
+    [Serializable]${N}
+ public class TableManager${N}
+{${N}
+     private static string[] MySplit(string str, string[] nTypeList, string regix)${N}
+     {${N}
+         if (string.IsNullOrEmpty(str))${N}
+         {${N}
+             return null;${N}
+         }${N}
+         String[] content = new String[nTypeList.Length];${N}
+         int nIndex = 0;${N}
+         int nstartPos = 0;${N}
+         while (nstartPos &lt;= str.Length)${N}
+         {${N}
+             int nsPos = str.IndexOf(regix, nstartPos);${N}
+             if (nsPos &lt; 0)${N}
+             {${N}
+                 String lastdataString = str.Substring(nstartPos);${N}
+                 if (string.IsNullOrEmpty(lastdataString) &amp;&amp; nTypeList[nIndex].ToLower() != "string")${N}
+                 {${N}
+                     content[nIndex++] = "--";${N}
+                 }${N}
+                 else${N}
+                 {${N}
+                     content[nIndex++] = lastdataString;${N}
+                 }${N}
+                 break;${N}
+             }${N}
+             else${N}
+             {${N}
+                 if (nstartPos == nsPos)${N}
+                 {${N}
+                     if (nTypeList[nIndex].ToLower() != "string")${N}
+                     {${N}
+                         content[nIndex++] = "--";${N}
+                     }${N}
+                     else${N}
+                     {${N}
+                         content[nIndex++] = "";${N}
+                     }${N}
+                 }${N}
+                 else${N}
+                 {${N}
+                     content[nIndex++] = str.Substring(nstartPos, nsPos - nstartPos);${N}
+                 }${N}
+                 nstartPos = nsPos + 1;${N}
+             }${N}
+         }${N}
+         return content;${N}
+     }${N}
+ private static string m_Key="";${N}
+ private static string[] m_Value;${N}	 
+private static string GetWinPathTail()${N}
+{${N}
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX${N}
+#if UNITY_EDITOR${N}
+        return "/Editor";${N}
+#elif PCBUILD ${N}
+        return "/PC";${N}
+#elif MACBUILD${N}
+        return "/MAC"${N}
+#elif PCTYBUILD || MACTYBUILD${N}
+        return "/TY";${N}
+#elif PCTESTBUILD || MACTESTBUILD${N}
+        return "/Test";${N}
+#else${N}
+        return "/PCUnknown";${N}
+#endif${N}
+#endif${N}
+return "";${N}
+} ${N}
+ public static bool ReaderPList(String xmlFile, SerializableTable _fun, Dictionary${L}int, List${L}object${R} ${R} _hash)${N}
+ {${N}
+ string[] list= xmlFile.Split('.'); ${N}
+ string relTablePath = list[0].Substring(6);${N}
+ List${L}string${R} alldataRow = new List${L}string${R}();${N}
+            int readIndex = 0;${N}
+            while (true)${N}
+            {${N}
+                string subName = "";${N}
+                if (readIndex > 0)${N}
+                {${N}
+                    subName = "-" + readIndex.ToString();${N}
+                }${N}
+                string[] readData = null;${N}
+                string tableFilePath = Application.persistentDataPath + "/ResData" + GetWinPathTail() + "/Table/" + relTablePath + subName + ".txt";${N}
+                if (File.Exists(tableFilePath))${N}
+                {${N}
+                    StreamReader sr = null;${N}
+                    sr = File.OpenText(tableFilePath);${N}
+                    string tableData = sr.ReadToEnd();${N}
+                    sr.Close();${N}
+                    readData = tableData.Split('\n');${N}
+                }${N}
+                else${N}
+                {${N}
+                    TextAsset testAsset = Resources.Load("Bundle/" + list[0] + subName, typeof(TextAsset)) as TextAsset;${N}
+                    if (null != testAsset)${N}
+                    {${N}
+                        readData = testAsset.text.Split('\n');${N}
+                    }${N}
+                }${N}
+                if (null == readData)${N}
+                {${N}
+                    break;${N}
+                }${N}
+                else${N}
+                {${N}
+                    foreach (string curRowData in readData)${N}
+                    {${N}
+                        alldataRow.Add(curRowData);${N}
+                    }${N}
+                }${N}
+                readIndex++;${N}
+            }${N}
+ //skip fort three${N}
+           int skip = 0;${N}
+           string[] typeList = null;${N}
+           string[] bIgnore = null;${N}
+		   int ignoreCount = 0;${N}
+           foreach (string line in alldataRow)${N}
+           {${N}
+           	int nKey = -1;${N}
+               if (skip == 1)${N}
+               {${N}
+                   string sztemp = line;${N}
+                   if (sztemp.Length ${R}= 1)${N}
+                   {${N}
+                       if (sztemp[sztemp.Length - 1] == '\r')${N}
+                       {${N}
+                           sztemp = sztemp.TrimEnd('\r');${N}
+                       }${N}
+                   }${N}
+                   typeList = sztemp.Split('\t');${N}
+                   m_Value = new string[typeList.Length];${N}
+                   ++skip;${N}
+                   continue;${N}
+               }${N}
+							else if (skip == 2)${N}
+               {${N}
+                   string sztemp = line;${N}
+                   if (sztemp.Length ${R}= 1)${N}
+                   {${N}
+                       if (sztemp[sztemp.Length - 1] == '\r')${N}
+                       {${N}
+                           sztemp = sztemp.TrimEnd('\r');${N}
+                       }${N}
+                   }${N}
+                   bIgnore = line.TrimEnd('\r').Split('\t');${N}
+				   for(int i=0; i${L}bIgnore.Length; i++)${N}
+                   {${N}
+                       if (bIgnore[i] == "N") ignoreCount++;${N}
+                   }${N}
+               }${N}
+               if (++skip ${L} 4) continue;${N}
+               if (String.IsNullOrEmpty(line)) continue;${N}
+				if(line[0] == '#')continue;${N}
+               string szlinetemp = line;${N}
+               if (szlinetemp.Length ${R}= 1)${N}
+               {${N}
+                   if (szlinetemp[szlinetemp.Length - 1] == '\r')${N}
+                   {${N}
+                       szlinetemp = szlinetemp.TrimEnd('\r');${N}
+                   }${N}
+               }${N}
+               string[] strCol = MySplit(szlinetemp, typeList, "\t");${N}
+               if (strCol.Length == 0) continue;${N}
+               string skey = strCol[0];${N}
+               string[] valuesList = new string[strCol.Length - ignoreCount];${N}${N}
+              
+               if (string.IsNullOrEmpty(skey) || skey.Equals("--"))${N}
+               {${N}
+                   skey = m_Key;${N}
+                   nKey = Int32.Parse(skey);		${N}
+                   valuesList[0] = skey;${N}
+                   int autoIndex = 1;${N}
+                   for (int i = 1; i ${L} strCol.Length; ++i)${N}
+                   {${N}
+                   			if (!String.IsNullOrEmpty(bIgnore[i]) ${C}${C} bIgnore[i] =="N") continue;${N}
+                       if (String.IsNullOrEmpty(strCol[i]) || strCol[i]=="--")${N}
+                       {
+                           valuesList[autoIndex++] = m_Value[i];${N}
+                       }${N}
+                       else${N}
+                       {${N}
+                           valuesList[autoIndex++] = strCol[i];${N}
+                           m_Value[i] = strCol[i];${N}
+                       }${N}
+                   }${N}${N}
+               }
+               else${N}
+               {${N}
+                   m_Key = skey;                   ${N}
+                   nKey = Int32.Parse(skey);		${N}
+                   int nIndex = 0;${N}
+                   for (int i = 0; i ${L} strCol.Length; ++i)${N}
+                   {${N}
+                   		 if (!String.IsNullOrEmpty(bIgnore[i]) ${C}${C} bIgnore[i] =="N") continue;${N}
+                       if (strCol[i] == "--")${N}
+                       {${N}
+                           valuesList[nIndex++] = "0";${N}
+                           m_Value[i] = "0";${N}
+                       }${N}
+                       else${N}
+                       {${N}
+                           valuesList[nIndex++] = strCol[i];${N}
+                           m_Value[i] = strCol[i];${N}
+                       }${N}
+                   }${N}
+               }${N}
+ _fun(valuesList, nKey, _hash);${N}
+ }${N}
+ return true;${N}
+ }${N}
+    public static int ConvertToInt32(string value)${N}
+    {${N}
+        if (value.Length ${R}= 1)${N}
+        {${N}
+            if (value[0] == '*')${N}
+            {${N}
+                string temp_string = value.Substring(1);${N}
+                return Convert.ToInt32(temp_string);${N}
+            }${N}
+        }${N}
+        return Convert.ToInt32(value);${N}
+    }${N}
+    public static long ConvertToInt64(string value)${N}
+    {${N}
+        if (value.Length ${R}= 1)${N}
+        {${N}
+            if (value[0] == '*')${N}
+            {${N}
+                string temp_string = value.Substring(1);${N}
+                return Convert.ToInt64(temp_string);${N}
+            }${N}
+        }${N}
+        return Convert.ToInt64(value);${N}
+    }${N}
+    public static float ConvertToSingle(string value)${N}
+    {${N}
+        if (value.Length ${R}= 1)${N}
+        {${N}
+            if (value[0] == '*')${N}
+            {${N}
+                string temp_string = value.Substring(1);${N}
+                return Convert.ToSingle(temp_string);${N}
+            }${N}
+        }${N}
+        return Convert.ToSingle(value);${N}
+    }${N}
+  </classhead>
+
+  <!--This below is Body-->
+  <managerdata>    
+	 private static Dictionary${L}int, List${L}Tab_${CodeName}${R} ${R} g_${CodeName} = new Dictionary${L}int, List${L}Tab_${CodeName}${R} ${R}();
+	${N} public static bool InitTable_${CodeName}()${N}
+ {${N}
+      g_${CodeName}.Clear();${N}
+      Dictionary${L}int, List${L}object${R} ${R} tmps = new Dictionary${L}int, List${L}object${R} ${R}();${N}
+      if (!Tab_${CodeName}.LoadTable(tmps)) return false;${N}
+      foreach (KeyValuePair${L}int, List${L}object${R} ${R} kv in tmps)${N}
+      {${N}
+         		  
+		   List${L}Tab_${CodeName}${R} values = new List${L}Tab_${CodeName}${R}();${N}
+     foreach (object subit in kv.Value)${N}
+     {${N}
+         values.Add((Tab_${CodeName})subit);${N}
+     }${N}
+     g_${CodeName}.Add(kv.Key, values);${N}
+	 
+      }${N}
+      return true;${N}
+ }
+ </managerdata>
+
+  <initsingle>
+    bRet ${C}= InitTable_${CodeName}();${N}
+  </initsingle>
+  
+  <inittable>  
+    public  bool InitTable()${N}
+    {${N}
+	bool bRet=true;${N}
+    ${FULLINIT}${N}
+	return bRet;${N}
+    }${N}
+  </inittable>
+
+  <manageropt>
+    public static List${L}Tab_${CodeName}${R}  Get${CodeName}ByID(int nKey)${N}
+    {${N}
+	if(g_${CodeName}.Count==0)${N}
+	{${N}
+		InitTable_${CodeName}();${N}
+	}${N}
+    if( g_${CodeName}.ContainsKey(nKey))${N}
+    {${N}
+    return g_${CodeName}[nKey];${N}
+    }${N}
+    return null;${N}
+    }${N}
+    
+	 public static Tab_${CodeName}  Get${CodeName}ByID(int nKey, int nIndex)${N}
+    {${N}
+	if(g_${CodeName}.Count==0)${N}
+	{${N}
+		InitTable_${CodeName}();${N}
+	}${N}
+    if( g_${CodeName}.ContainsKey(nKey))${N}
+    {${N}
+	if(nIndex${R}=0 ${C}${C} nIndex${L}g_${CodeName}[nKey].Count)${N}
+    return g_${CodeName}[nKey][nIndex];${N}
+    }${N}
+    return null;${N}
+    }${N}
+
+
+	public static  Dictionary${L}int, List${L}Tab_${CodeName}${R} ${R}  Get${CodeName}()${N}
+	{${N}
+	if(g_${CodeName}.Count==0)${N}
+	{${N}
+		InitTable_${CodeName}();${N}
+	}${N}
+	return g_${CodeName};${N}
+	}${N}
+  </manageropt>
+
+  <tail>${N}}${N}}${N}</tail>
+  </plist>
+  
